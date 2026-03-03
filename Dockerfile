@@ -1,16 +1,16 @@
-FROM ubuntu:22.04
+FROM alpine:3.20 AS builder
 
-RUN apt-get update
+RUN apk add --no-cache curl unzip
 
-RUN apt-get install -y curl zip nginx
+RUN curl -fsSL -o /tmp/master.zip \
+      https://codeload.github.com/gabrielecirulli/2048/zip/master \
+    && unzip /tmp/master.zip -d /tmp \
+    && mv /tmp/2048-master /app
 
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+FROM nginx:1.27-alpine
 
-RUN curl -o /var/www/html/master.zip -L https://codeload.github.com/gabrielecirulli/2048/zip/master
-
-RUN cd /var/www/html && unzip master.zip && mv 2048-master/* . && rm -rf 2048-master master.zip
+COPY --from=builder /app /usr/share/nginx/html
 
 EXPOSE 80
 
-CMD [ "/usr/sbin/nginx", "-c", "/etc/nginx/nginx.conf" ]
-
+CMD ["nginx", "-g", "daemon off;"]
