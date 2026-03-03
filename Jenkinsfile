@@ -96,14 +96,16 @@ pipeline {
                         sh """
                         ssh -o StrictHostKeyChecking=no -i ${KEY_PATH} ${INSTANCE_USER}@${env.INSTANCE_IP} <<EOF
                         cat <<EOT > Dockerfile
-                        FROM ubuntu:22.04
-                        RUN apt-get update
-                        RUN apt-get install -y curl zip nginx
-                        RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-                        RUN curl -o /var/www/html/master.zip -L https://codeload.github.com/gabrielecirulli/2048/zip/master
-                        RUN cd /var/www/html && unzip master.zip && mv 2048-master/* . && rm -rf 2048-master master.zip
+                        FROM alpine:3.20 AS builder
+                        RUN apk add --no-cache curl unzip
+                        RUN curl -fsSL -o /tmp/master.zip \
+                              https://codeload.github.com/gabrielecirulli/2048/zip/master \
+                            && unzip /tmp/master.zip -d /tmp \
+                            && mv /tmp/2048-master /app
+                        FROM nginx:1.27-alpine
+                        COPY --from=builder /app /usr/share/nginx/html
                         EXPOSE 80
-                        CMD [ "/usr/sbin/nginx", "-c", "/etc/nginx/nginx.conf" ]
+                        CMD ["nginx", "-g", "daemon off;"]
                         EOT
                         
                         sudo docker build -t 2048-game .
