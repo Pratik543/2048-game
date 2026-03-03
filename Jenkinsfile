@@ -79,7 +79,7 @@ pipeline {
                         sh """
                         ssh -o StrictHostKeyChecking=no -i ${KEY_PATH} ${INSTANCE_USER}@${env.INSTANCE_IP} <<EOF
                         sudo apt-get update
-                        sudo apt-get install -y docker.io
+                        sudo curl -fsSL https://get.docker.com/ | sh
                         sudo systemctl start docker
                         sudo systemctl enable docker
                         EOF
