@@ -1,5 +1,27 @@
 # 2048-game 🚀 
 
+# Project Setup 
+
+1. Create a AWS EC2 instance (To Setup this project i am using 2 EC2 instances. first for Jenkins and second for the application which will be setup automatically through terraform via Jenkins pipeline)
+2. Use the intial_script.sh to setup the instance
+3. Create a Jenkins pipeline
+4. Add the credentials to the [ Global Credentials ](#jenkins-global-credentials)
+5. Install [ Plugins ](#jenkins-plugins)
+
+## Jenkins Global Credentials
+
+- AWS_ACCESS_KEY_ID (secret text)
+- AWS_SECRET_ACCESS_KEY (secret text)
+- EC2_SSH_KEY (secret file)
+- EC2_KEY_NAME (secret text)
+
+## Jenkins Plugins
+
+- Pipeline Stage View (for pipeline visualization)
+- Terraform (for terraform commands)
+- SSH Agent (for ssh commands)
+
+## For Local Deployment and Testing
 ```markdown
 # 2048 Game Dockerfile
 
@@ -53,5 +75,3 @@ docker rm 2048-game-container
 ```
 
 This will stop and remove the container named "2048-game-container."
-
-Enjoy playing the 2048 game locally with Docker!

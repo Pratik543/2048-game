@@ -33,3 +33,11 @@ curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv
 unzip -o awscliv2.zip
 sudo ./aws/install --update
 sudo rm -rf ./aws ./awscliv2.zip
+
+
+# Jenkins Password
+echo "Jenkins Password: "
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+# Jenkins URL
+echo "Jenkins URL: http://$(curl -s http://checkip.amazonaws.com):8080"
