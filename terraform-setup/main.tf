@@ -115,7 +115,6 @@ resource "aws_instance" "jenkins_server" {
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_default_security_group.default.id]
   key_name               = var.key_name
-  user_data_base64       = base64encode(file("${path.module}/script.sh"))
 
   tags = {
     Name = "Terraform-Jenkins-Server-for-2048-Game"

@@ -2,7 +2,6 @@ pipeline {
     agent any  // Run on any available Jenkins agent
 
     environment {
-        AWS_REGION = "ap-south-1"  // Change as per your setup
         INSTANCE_USER = "ubuntu"
         TERRAFORM_DIR = "$WORKSPACE/terraform-setup"  // Directory with main.tf
     }
@@ -28,6 +27,22 @@ pipeline {
                             terraform init
                             """
                         }
+                    }
+                }
+            }
+        }
+
+        stage('Add values in Terraform tfvars file') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'AWS_REGION',   variable: 'AWS_REGION'),
+                    string(credentialsId: 'EC2_KEY_NAME', variable: 'EC2_KEY_NAME')
+                ]) {
+                    dir(TERRAFORM_DIR) {
+                        writeFile file: 'terraform.tfvars', text: """\
+                            region   = "${AWS_REGION}"
+                            key_name = "${EC2_KEY_NAME}"
+                        """.stripIndent()
                     }
                 }
             }
@@ -79,9 +94,10 @@ pipeline {
                         sh """
                         ssh -o StrictHostKeyChecking=no -i ${KEY_PATH} ${INSTANCE_USER}@${env.INSTANCE_IP} <<EOF
                         sudo apt-get update
-                        sudo curl -fsSL https://get.docker.com/ | sh
-                        sudo systemctl start docker
-                        sudo systemctl enable docker
+                        sudo apt-get install -y docker.io
+                        sudo systemctl enable --now docker
+                        whoami
+                        sudo usermod -aG docker "$(whoami)"
                         EOF
                         """
                     }
